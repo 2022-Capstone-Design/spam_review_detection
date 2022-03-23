@@ -1,25 +1,32 @@
-import time
-from bs4 import BeautifulSoup
-from selenium import webdriver
 from urllib.request import urlopen
 from urllib.parse import quote_plus
+from bs4 import BeautifulSoup
+from selenium import webdriver
+import time
+import requests
+import shutil
 
-testUrl1 = "https://www.instagram.com/explore/tags"
-testUrl2 = input("검색어를 입력하세요")
-testUrl3 = testUrl1 + quote_plus(testUrl2)
+baseUrl = "https://www.instagram.com/explore/tags/"
+plusUrl = input("검색어를 입력하세요")
+url = baseUrl + quote_plus(plusUrl)
 
-driver01 = webdriver.Chrome()
-driver01.get(testUrl3)
-
-himl01 = driver01.page_source
-Source01 = BeautifulSoup(himl01)
-
+driver = webdriver.Chrome()
+driver.get(url)
 time.sleep(3)
+html = driver.page_source
+soup = BeautifulSoup(html, 'lxml')
 
-Dem_insta = Source01.select('_9AhH0')
+insta = soup.select('v1Nh3.kIKUG._bz0w')
 
-x = 1
-
+n = 1
 for i in insta:
-    print("https://www.instagram.com/" + i.a['href'])
-    img01 = i.select_one()
+    print('https://www.instagram.com' + i.a['href'])
+    imgUrl = i.select_one('_9AhH0').img['src']
+
+    with urlopen(imgUrl) as f:
+        with open('./img/' + plusUrl + str(n) + '.jpg', 'wb') as h:
+            img = f.read()
+            h.write(img)
+        n += 1
+
+driver.close()
