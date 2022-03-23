@@ -1,6 +1,7 @@
 # 이미지가 저장될 img 폴더가 존재해야함
+# [L29 - L30] id & password 수정
 # 우선은 이미지 추가하는 스크롤 기능 미사용
-# 일부러 URL 출력되도록 만들어놓았음 --> 출력 부분 삭제해야함
+# [L57, L73 - L74] 일부러 URL 출력되도록 만들어놓았음 --> 출력 부분 삭제해야함
 
 from urllib.request import urlopen
 from urllib.parse import quote_plus
@@ -25,8 +26,8 @@ login_button = driver.find_element_by_css_selector\
 
 act = ActionChains(driver)
 
-act.send_keys_to_element(id_box, 'suthink__')\
-    .send_keys_to_element(password_box, 'wkd!!tnaud11')\
+act.send_keys_to_element(id_box, 'id입력')\
+    .send_keys_to_element(password_box, 'password입력')\
     .click(login_button).perform()
 time.sleep(3)
 
