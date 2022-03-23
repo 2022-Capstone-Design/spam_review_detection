@@ -1,3 +1,8 @@
+'''
+    [file]
+    check_crawling.py :: 각 task별 예외처리 확인을 위한 test file
+'''
+
 from bs4 import BeautifulSoup              
 from selenium import webdriver             # selenium module import
 from selenium.webdriver.common.keys import Keys
@@ -10,10 +15,8 @@ import re
 import json
 import pandas as pd
 import numpy as np
+from config_ES import user_id, user_pw
 import random
-from Crawling_Instagram.config_ES import user_id, user_pw
-
-
 
 
 
@@ -38,7 +41,7 @@ class Crawl_Insta:
             date_text : 게시물 게시 날짜 (월 일)
             date_time : 게시물 게시 날짜 (datetime 형식)
             date_title : 게시물 게시 날짜 (년 월 일)
-            main_image_url : 게시물 본문(image) url
+            main_image_url : 게시물 본문(image)
             main_text : 게시물 본문(text)
             tag : 본문 속 tag
             comment : 게시물 댓글
@@ -58,12 +61,12 @@ class Crawl_Insta:
         self.is_login_success = False                        # login 성공 여부
         self.keyword = ''                                    # hashtag keyword
         self.count_extract = 0                               # 현재 crawlng한 게시물 개수 count
-        self.update_num = 100                                # 중간 저장 게시글 개수
-        self.update_fix_num = self.update_num                # 중간 저장 고정 게시물 개수 (몇 개씩 끊어서 저장할 것인지)
-        self.wish_num = 300                                  # 최종적으로 crawling할 게시물 개수
+        self.update_num = 10                                 # 중간 저장 게시글 개수
+        self.update_fix_num = self.update_num                # 중간 저장 고정 게시글 개수 (몇 개씩 끊어서 저장?)
+        self.wish_num = 30                                   # 최종적으로 crawling할 게시물 개수
         self.check_next = True                               # 다음 버튼이 있는지 확인
         self.save_cnt = 0                                    # 저장 version
-        self.print_flag = False                              # True면 추출한 데이터 출력
+        self.print_flag = True                               # True면 추출한 데이터 출력
         ## 저장할 데이터 list
         self.location_infos = []
         self.location_hrefs = []
@@ -75,7 +78,6 @@ class Crawl_Insta:
         self.main_images_url = []
         self.instagram_tags = []
         self.comments = []
-
 
         print("\n------- data extraction info -------")
         print("추출할 데이터 개수 :", self.wish_num)
@@ -93,26 +95,22 @@ class Crawl_Insta:
         self.driver.implicitly_wait(3)
 
 
-    def __del__(self):   
-        '''
-        __del__() : 소멸자 함수
-                    crawling 작업이 끝난 후 chrome webdriver 닫기
-        '''
+    # def __del__(self):   
+    #     '''
+    #     __del__() : 소멸자 함수
+    #                 crawling 작업이 끝난 후 chrome webdriver 닫기
+    #     '''
         
-        self.driver.close()
-        self.driver.quit()
+    #     self.driver.close()
+    #     self.driver.quit()      
+    
 
-    '''
-    다음 action 전 random으로 time sleep 주기
-        delay_until_next_step() 
-        make_random_sleep_time()
-    '''
     def delay_until_next_step(self, start,end):
         time.sleep(self.make_random_sleep_time(start=start, end=end+1))
     
     def make_random_sleep_time(self, start, end):
         return random.randrange(start=start, stop=end+1)
-           
+    
     
     def login(self):
         '''
@@ -161,7 +159,7 @@ class Crawl_Insta:
         '''
 
         # keyword 저장
-        print("\n크롤링할 해시태그를 입력해주세요")
+        print("크롤링할 해시태그를 입력해주세요")
         print("ex) '#건대맛집' 해시태그를 검색하려면 '건대맛집'이라고 입력")
         self.keyword = input("Input HashTag : ")
         # self.keyword = '#' + self.keyword
@@ -186,30 +184,47 @@ class Crawl_Insta:
 
         '''
         [data column 정보]
-            writer_id : 작성자 id -> OK
-            location_info : 게시물 위치정보 이름 -> OK
-            location_href : 게시물 위치정보 url -> OK
-            date_text : 게시물 게시 날짜 (월 일) 
+            writer_id : 작성자 id
+            location_info : 게시물 위치정보 이름
+            location_href : 게시물 위치정보 url
+            date_text : 게시물 게시 날짜 (월 일)
             date_time : 게시물 게시 날짜 (datetime 형식)
             date_title : 게시물 게시 날짜 (년 월 일)
-            main_image_url : 게시물 본문(image)
-            main_text : 게시물 본문(text) -> OK
-            tag : 본문 속 tag 및 comment tag -> 둘 다 OK
-            comment : 게시물 댓글 -> OK
+            main_image_url : 게시물 본문(image) url
+            main_text : 게시물 본문(text)
+            tag : 본문 속 tag
+            comment : 게시물 댓글
         '''
 
         try:
-            # 첫번째 게시물 클릭 :: 최근게시물
-            first_img_css = '#react-root > section > main > article > div:nth-child(3) > div > div:nth-child(1) > div:nth-child(1) > a > div'
+            # 게시물 클릭 :: 특정 게시물
+            first_img_css = '#react-root > section > main > article > div.EZdmt > div > div > div:nth-child(1) > div:nth-child(3)'
+        
             self.driver.find_element_by_css_selector(first_img_css).click()
-
-            self.delay_until_next_step(start=5,end=7)
+            time.sleep(5)
         except:
             print("--------- 게시물이 없습니다! ---------")
             pass
 
+        '''
+        [check Complete list] 
+            login OK
+            location OK
+            upload_id OK
+            date
+            text OK
+            image
+            text tag OK
+            comment OK
+            comment tag OK
+            next_btn OK
+
+            -> date는 필요있는 데이터는 아니라고 생각해서 생략 가능
+            -> img url은 해결해야 함!!
+        '''
+        
         # data crawling
-        ## crawling object css
+        # crawling object css
         location_object_css = "body > div.RnEpo._Yhr4 > div.pbNvD.QZZGH.bW6vo > div > article > div > div.HP0qD > div > div > div.UE9AK > div > header > div.o-MQd.z8cbW > div.M30cS > div > div.JF9hh > div > a"
         upload_id_object_css = "body > div.RnEpo._Yhr4 > div.pbNvD.QZZGH.bW6vo > div > article > div > div.HP0qD > div > div > div.UE9AK > div > header > div.o-MQd.z8cbW > div.PQo_0.RqtMr > div.e1e1d > div > span > a"
         date_object_css = "body > div.RnEpo._Yhr4 > div.pbNvD.QZZGH.bW6vo > div > article > div > div.qF0y9.Igw0E.IwRSH.eGOV_._4EzTm > div > div > div.NnvRN > div"
@@ -232,7 +247,6 @@ class Crawl_Insta:
         next_btn_css1 = "body > div.RnEpo._Yhr4 > div.Z2Inc._7c9RR > div > div > button"
         
         
-        # data extraction
         while True:
             if self.count_extract > self.wish_num:
                 self.save_data()
@@ -254,7 +268,6 @@ class Crawl_Insta:
             except:
                 location_info = None
                 location_href = None
-            self.delay_until_next_step(start=2,end=4)
 
             # 작성자ID extraction
             try:
@@ -262,8 +275,7 @@ class Crawl_Insta:
                 upload_id = upload_id_object.text
             except:
                 upload_id = None
-            self.delay_until_next_step(start=2,end=4)
-
+            
             # 게시 날짜 extraction
             '''
                 [comment] 아니 이거 왜 안받아와지지?!?!?!?! 왜?!?!?!?
@@ -277,13 +289,9 @@ class Crawl_Insta:
                 date_text = None
                 date_time = None
                 date_title = None
-            self.delay_until_next_step(start=2,end=4)
 
+            
             # 본론 extraction
-            # [수정] image url 저장하는 부분
-            '''
-                [comment] text 받아오는 것은 된다. 하지만 image url 받아오는 건 왜 안되는 거지?!
-            '''
             try:
                 # text
                 main_text_object = self.driver.find_element_by_css_selector(main_text_object_css)
@@ -295,6 +303,30 @@ class Crawl_Insta:
             except:
                 main_text = None
                 main_image_url = None
+            
+            
+            # 본문 extraction
+            '''
+                [comment] text 받아오는 것은 된다. 하지만 image url 받아오는 건 왜 안되는 거지?!
+            '''
+            # try:
+            #     # text
+            #     main_text_object = self.driver.find_element_by_css_selector(main_text_object_css)
+            #     main_text = main_text_object.text
+            #     time.sleep(3)
+            #     try:
+            #         main_image_object = self.driver.find_element_by_css_selector(main_image_object_css1)
+            #         time.sleep(2)
+            #         main_image_url = main_image_object.get_attribute("src")
+            #     except:
+            #         try:
+            #             main_image_object = self.driver.find_element_by_css_selector(main_image_object_css2)
+            #             time.sleep(2)
+            #             main_image_url = main_image_object.get_attribute("src")
+            #         except:
+            #             main_image_url = None
+            # except:
+            #     main_text = None
 
             # 본문 속 태그 extraction
             tag_list = []
@@ -309,6 +341,7 @@ class Crawl_Insta:
             except:
                 pass
 
+
             # 댓글 extraction
             ## 더보기 버튼
             try:
@@ -319,15 +352,17 @@ class Crawl_Insta:
                     except:
                         break
             except:
-                print("\n------------ fail to click more btn ------------")
+                print("------------ fail to click more btn ------------")
                 pass
-            self.delay_until_next_step(start=3,end=5)
+            self.delay_until_next_step(start=3,end=7)
+
             ## 댓글 데이터
             try:
                 comment_data = {}
                 comment_ids_objects = self.driver.find_elements_by_css_selector(comment_ids_object_css)
                 # comment_texts_objects = self.driver.find_elements_by_css_selector(comment_texts_object_css)
                 self.delay_until_next_step(start=2,end=5)
+                print("comment_ids_len :", len(comment_ids_objects))
                 try:
                     for idx in range(len(comment_ids_objects)):
                         # 댓글
@@ -354,35 +389,36 @@ class Crawl_Insta:
                         comment_data[str((idx+1))] = {'comment_id':comment_id, 
                                                     'comment_text':comment_texts_object.text,
                                                     'comment_text2':comment_text2}
+                    # print("comment_data :", comment_data)
                 except:
-                    print("XXXXXXX")
+                    print("XXXXXXXXX")
             except:
                 comment_id = None
                 comment_text = None
                 comment_text2 = None
                 comment_data = {}
-            
+                print("fail")
+
+            # tag extraction
             try:
                 if comment_data != {}:
                     keys = list(comment_data.keys())
 
                     for key in keys:
                         if comment_data[key]['comment_id'] == upload_id:
-                            # 댓글의 tag data 저장
                             tags = re.findall('#[A-Za-z0-9가-힣]+', comment_data[key]['comment_text'])
                             tag = ''.join(tags).replace("#", " ")
                             tag_data = tag.split()
                             for tag_one in tag_data:
                                 tag_list.append(tag_one)
                             
-                            # 대댓글의 tag data 저장
                             tags = re.findall('#[A-Za-z0-9가-힣]+', comment_data[key]['comment_text2'])
                             tag = ''.join(tags).replace("#", " ")
                             tag_data = tag.split()
                             for tag_one in tag_data:
                                 tag_list.append(tag_one)
                 else:
-                    print("댓글 없음")
+                    print("XXXXXXXXXX")
             except:
                 print("fail")
                 pass
@@ -406,14 +442,15 @@ class Crawl_Insta:
                 ("\n---------- INFO ----------")
                 print("location_info :", location_info)
                 print("location_href :", location_href)
-                print("upload_id :", upload_id)
+                print("uplodat_id :", upload_id)
                 print("date : {} {} {}".format(date_text, date_time, date_title))
                 print("main :", main_text)
                 print("comment :", comment_data)
                 print("insta tags :", tag_list)
-                ("--------------------------\n")
+                ("--------------------------")
+                print()
 
-            # 지정된 개수씩 csv로 저장
+            # 100개씩 csv로 저장
             self.count_extract += 1
             if self.update_num == self.count_extract:
                 self.update_num += self.update_fix_num
@@ -423,21 +460,21 @@ class Crawl_Insta:
             try:
                 WebDriverWait(self.driver, 100).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, next_btn_css1)))
                 time.sleep(5)
-                print("잘 기다렸다 !\n")
+                print("잘 기다렸다 !")
                 next_btn = self.driver.find_element_by_css_selector(next_btn_css1)
                 next_btn.send_keys(Keys.ENTER)
                 self.check_next = True
             except:
-                self.check_next = False
                 print("버튼 작동 X")
+                self.check_next = False
 
-
+    
     def save_data(self):
         '''
         save_data() : 추출한 데이터 csv 파일로 저장
         '''
         self.save_cnt += 1
-        save_file_name = '['+self.keyword+ "]instagram_data_"+self.save_cnt
+        save_file_name = self.keyword+ "_instagram_data_"+str(self.save_cnt)
         
         try:
             # data list를 dataframe으로 변환 후 csv로 저장
@@ -461,7 +498,6 @@ class Crawl_Insta:
             self.comments = []
         except:
             print("fail total save data")
-
         
 
 if __name__ == "__main__":
