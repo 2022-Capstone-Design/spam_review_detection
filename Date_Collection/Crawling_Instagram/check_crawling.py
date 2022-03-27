@@ -68,16 +68,17 @@ class Crawl_Insta:
         self.save_cnt = 0                                    # 저장 version
         self.print_flag = True                               # True면 추출한 데이터 출력
         ## 저장할 데이터 list
-        self.location_infos = []
-        self.location_hrefs = []
-        self.upload_ids = []
-        self.date_texts = []
-        self.date_times = []
-        self.date_titles = []
-        self.main_texts = []
-        self.main_images_url = []
-        self.instagram_tags = []
-        self.comments = []
+        self.post_urls = []                                  # 게시글 url
+        self.location_infos = []                             # 위치 정보
+        self.location_hrefs = []                             # 위치 하이퍼링크(url)
+        self.upload_ids = []                                 # 작성자 id
+        self.date_texts = []                                 # 작성 날짜 (text)
+        self.date_times = []                                 # 작성 날짜 (datetime)
+        self.date_titles = []                                # 작성 날짜 (title)
+        self.main_texts = []                                 # 게시글 텍스트
+        self.main_images_url = []                            # 게시글 이미지 url
+        self.instagram_tags = []                             # 게시글 tag
+        self.comments = []                                   # 게시글 댓글
 
         print("\n------- data extraction info -------")
         print("추출할 데이터 개수 :", self.wish_num)
@@ -184,6 +185,7 @@ class Crawl_Insta:
 
         '''
         [data column 정보]
+            post_url : 게시글 url
             writer_id : 작성자 id
             location_info : 게시물 위치정보 이름
             location_href : 게시물 위치정보 url
@@ -197,8 +199,8 @@ class Crawl_Insta:
         '''
 
         try:
-            # 게시물 클릭 :: 특정 게시물
-            first_img_css = '#react-root > section > main > article > div.EZdmt > div > div > div:nth-child(1) > div:nth-child(3)'
+            # 게시물 클릭 :: 최근게시물에서 첫번째 게시글
+            first_img_css = '#react-root > section > main > article > div:nth-child(3) > div > div:nth-child(1) > div:nth-child(1)'
         
             self.driver.find_element_by_css_selector(first_img_css).click()
             time.sleep(5)
@@ -208,6 +210,7 @@ class Crawl_Insta:
 
         '''
         [check Complete list] 
+            post url
             login OK
             location OK
             upload_id OK
@@ -244,7 +247,8 @@ class Crawl_Insta:
         body > div.RnEpo._Yhr4 > div.pbNvD.QZZGH.bW6vo > div > article > div > div.HP0qD > div > div > div.eo2As > div.EtaWk > ul > ul:nth-child(112) > div > li > div > div > div.C4VMK > div.MOdxS # 마지막 댓글 text(총 111개)
         '''
         # next_btn_css1 = "div.l8mY4.feth3 > .wpO6b "
-        next_btn_css1 = "body > div.RnEpo._Yhr4 > div.Z2Inc._7c9RR > div > div > button"
+        # next_btn_css1 = "body > div.RnEpo._Yhr4 > div.Z2Inc._7c9RR > div > div > button"
+        next_btn_css1 = 'body > div.RnEpo._Yhr4 > div.Z2Inc._7c9RR > div > div.l8mY4.feth3 > button'
         
         
         while True:
@@ -259,6 +263,12 @@ class Crawl_Insta:
                 self.save_data()
                 print("\n최종 저장 게시물 개수 :", self.count_extract)
                 break
+            
+            # 게시글 url extraction
+            try:
+                post_url = self.driver.current_url
+            except:
+                post_url = None
 
             # 위치 정보 extraction
             try:
@@ -425,6 +435,7 @@ class Crawl_Insta:
 
 
             # 추출한 데이터를 dataframe에 추가
+            self.post_urls.append(post_url)
             self.location_infos.append(location_info)
             self.location_hrefs.append(location_href)
             self.upload_ids.append(upload_id)
@@ -440,6 +451,7 @@ class Crawl_Insta:
             # 추출한 데이터 출력
             if self.print_flag:
                 ("\n---------- INFO ----------")
+                print("post_url :", post_url)
                 print("location_info :", location_info)
                 print("location_href :", location_href)
                 print("uplodat_id :", upload_id)
@@ -460,7 +472,7 @@ class Crawl_Insta:
             try:
                 WebDriverWait(self.driver, 100).until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, next_btn_css1)))
                 time.sleep(5)
-                print("잘 기다렸다 !")
+                print("\n잘 기다렸다 !\n")
                 next_btn = self.driver.find_element_by_css_selector(next_btn_css1)
                 next_btn.send_keys(Keys.ENTER)
                 self.check_next = True
@@ -478,7 +490,7 @@ class Crawl_Insta:
         
         try:
             # data list를 dataframe으로 변환 후 csv로 저장
-            instagram_data_df = pd.DataFrame({"writer_id":self.upload_ids, 
+            instagram_data_df = pd.DataFrame({"post_url":self.post_urls, "writer_id":self.upload_ids, 
                                             "location_info":self.location_infos, "location_href":self.location_hrefs, 
                                             "date_text":self.date_texts, "date_time":self.date_times, "date_title":self.date_titles,
                                             "main_image_url":self.main_images_url, "main_text":self.main_texts, 
@@ -486,6 +498,7 @@ class Crawl_Insta:
             instagram_data_df.to_csv("{}.csv".format(save_file_name), index=False)
 
             # data list 초기화
+            self.post_urls = []
             self.location_infos = []
             self.location_hrefs = []
             self.upload_ids = []
