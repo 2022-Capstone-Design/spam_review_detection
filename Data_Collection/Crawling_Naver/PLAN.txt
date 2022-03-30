@@ -1,2 +1,1 @@
-Instagram data에서 추려진 restaurant list를 토대로
-'Naver'에서 음식점 category, Datalab, 위치, 영업시간, 리뷰, 대표사진 등을 crawling 할 예정
+'Naver'에서 음식점 category, 위치, 영업시간, 리뷰, 대표사진 등을 crawling 할 예정
