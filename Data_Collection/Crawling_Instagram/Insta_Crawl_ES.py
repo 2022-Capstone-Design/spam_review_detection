@@ -1,3 +1,8 @@
+'''
+    [file]
+    Insta_Crawl_ES.py :: 가져올 수 있는 데이터 모두 추출한 crawler (초기 ver.)
+'''
+
 from bs4 import BeautifulSoup              
 from selenium import webdriver             # selenium module import
 from selenium.webdriver.common.keys import Keys
@@ -11,7 +16,7 @@ import json
 import pandas as pd
 import numpy as np
 import random
-from Crawling_Instagram.config_ES import user_id, user_pw
+from config_ES import user_id, user_pw
 
 
 
@@ -32,13 +37,14 @@ class Crawl_Insta:
                     chrome webdriver open 및 Instagram login url 열기
         
         [data column 정보]
+            post_url : 게시글 url
             writer_id : 작성자 id
             location_info : 게시물 위치정보 이름
             location_href : 게시물 위치정보 url
             date_text : 게시물 게시 날짜 (월 일)
             date_time : 게시물 게시 날짜 (datetime 형식)
             date_title : 게시물 게시 날짜 (년 월 일)
-            main_image_url : 게시물 본문(image) url
+            main_image_url : 게시물 본문(image)
             main_text : 게시물 본문(text)
             tag : 본문 속 tag
             comment : 게시물 댓글
@@ -449,7 +455,7 @@ class Crawl_Insta:
         save_data() : 추출한 데이터 csv 파일로 저장
         '''
         self.save_cnt += 1
-        save_file_name = '['+self.keyword+ "]instagram_data_"+self.save_cnt
+        save_file_name = '['+self.keyword+ "]instagram_data_"+str(self.save_cnt)
         
         try:
             # data list를 dataframe으로 변환 후 csv로 저장
