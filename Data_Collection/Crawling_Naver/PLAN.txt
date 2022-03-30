@@ -1,0 +1,1 @@
+'Naver'에서 음식점 category, 위치, 영업시간, 리뷰, 대표사진 등을 crawling 할 예정
