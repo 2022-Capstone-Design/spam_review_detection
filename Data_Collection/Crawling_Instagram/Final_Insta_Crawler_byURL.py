@@ -371,6 +371,7 @@ class Crawl_Insta:
                 print("\n최종 저장 게시물 개수 :", self.count_extract)
                 self.save_data(keyword)
                 break
+
             
             # 다음 게시물로 넘어가기
             try:
@@ -391,6 +392,7 @@ class Crawl_Insta:
             input parameter : (int)keyword - 가게 아이디
 
         '''
+
         # self.save_cnt += 1
         # save_file_name = str(keyword)+ "_instagram_data_"+str(self.save_cnt)
         save_file_name = str(keyword)+ "_instagram_data"
