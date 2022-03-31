@@ -225,16 +225,16 @@ class Crawl_Insta:
 
         # data extraction
         while True:
-            if self.count_extract > self.wish_num:
-                # self.save_data(keyword)
-                print("\n최종 저장 게시물 개수 :", self.count_extract)
-                break
+            # if self.count_extract > self.wish_num:
+            #     # self.save_data(keyword)
+            #     print("\n최종 저장 게시물 개수 :", self.count_extract-1)
+            #     break
 
             self.delay_until_next_step(start=4, end=7)
 
             if self.check_next == False:
-                self.save_data(keyword)
                 print("\n최종 저장 게시물 개수 :", self.count_extract)
+                self.save_data(keyword)
                 break
 
             # 게시글 url extraction
@@ -366,9 +366,12 @@ class Crawl_Insta:
 
             # 지정된 개수씩 csv로 저장
             self.count_extract += 1
-            if self.update_num == self.count_extract:
-                self.update_num += self.update_fix_num
+            if self.wish_num == self.count_extract:
+                # self.update_num += self.update_fix_num
+                print("\n최종 저장 게시물 개수 :", self.count_extract)
                 self.save_data(keyword)
+                break
+
             
             # 다음 게시물로 넘어가기
             try:
@@ -389,8 +392,9 @@ class Crawl_Insta:
             input parameter : (int)keyword - 가게 아이디
 
         '''
-        self.save_cnt += 1
-        # save_file_name = str(keyword)+ "_instagram_data_"+self.save_cnt
+
+        # self.save_cnt += 1
+        # save_file_name = str(keyword)+ "_instagram_data_"+str(self.save_cnt)
         save_file_name = str(keyword)+ "_instagram_data"
         
         try:
@@ -399,11 +403,13 @@ class Crawl_Insta:
                                             "main_text":self.main_texts, "tag":self.instagram_tags})
             instagram_data_df.to_csv("{}.csv".format(save_file_name), index=False)
 
-            # data list 초기화
+            # data list 초기화 및 변수 초기화
             self.post_urls = []
             self.upload_ids = []
             self.main_texts = []
             self.instagram_tags = []
+            self.count_extract = 0
+            self.check_next = True
 
             
         except:
