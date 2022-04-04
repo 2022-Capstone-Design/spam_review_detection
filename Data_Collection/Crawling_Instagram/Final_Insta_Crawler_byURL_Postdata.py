@@ -1,6 +1,6 @@
 '''
     [file]
-    Final_Insta_Crawler_byURL_withIMG.py :: project에 필요한 데이터만을 추출(최종본)
+    Final_Insta_Crawler_byURL_Postdata.py :: project에 필요한 데이터만을 추출(최종본)
                                             img 저장할 때 해당하는 게시물 URL 받아와서 데이터 추출
 '''
 
