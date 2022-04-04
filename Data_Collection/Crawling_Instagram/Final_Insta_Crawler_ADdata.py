@@ -1,6 +1,6 @@
 '''
     [file]
-    Final_Insta_Crawler_byID.py :: project에 필요한 데이터만을 추출(최종본)
+    Final_Insta_Crawler_ADdata.py :: project에 필요한 데이터만을 추출(최종본)
                                 광고데이터 수집 - 광고 계정으로 이동
 '''
 
