@@ -92,9 +92,9 @@ class Preprocessing:
         '''
     
         # csv_name = "Data_Collection/Crawling_Instagram/Data/instagram_data_AD_label.csv"
-        csv_name = "Data_Collection/Crawling_Instagram/Data/removed_instagram_data_AD_label.csv"
+        csv_name = "Spam_Detection/Cleaned_Data/cleaned_Insta.csv"
         total_data = pd.read_csv(csv_name)
-        total_data = total_data.drop(['idx'], axis = 1)     # 전체 데이터
+        # total_data = total_data.drop(['idx'], axis = 1)     # 전체 데이터
         # text_data = total_data.loc[:, ['main_text']]
         
         return total_data
@@ -235,7 +235,8 @@ class Preprocessing:
             similar_sum=0
             cnt = 0
             if total_data['AD'][idx] == 1:
-                similar_tfidf.append('AD')
+                # similar_tfidf.append('AD')
+                similar_tfidf.append(1)
                 continue
             for idxx in range(len(cleaned_main_text)):
                 if total_data['AD'][idxx] == 1:
@@ -277,7 +278,8 @@ class Preprocessing:
             similar_sum=0
             cnt = 0
             if total_data['AD'][idx] == 1:
-                similar_ft.append('AD')
+                # similar_ft.append('AD')
+                similar_ft.append(1)
                 continue
             for idxx in range(len(cleaned_main_text)):
                 if total_data['AD'][idxx] == 1:
@@ -307,7 +309,8 @@ class Preprocessing:
             similar_sum=0
             cnt = 0
             if total_data['AD'][idx] == 1:
-                similar_ft_ft.append('AD')
+                # similar_ft_ft.append('AD')
+                similar_ft_ft.append(1)
                 continue
             for idxx in range(len(cleaned_main_text)):
                 if total_data['AD'][idxx] == 1:

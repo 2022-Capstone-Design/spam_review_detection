@@ -47,17 +47,22 @@ class Detection:
         sorting() : 유사도 기반 sorting
         '''
         data = self.DataLoad()
-        target = data.loc[data['AD']==2, :]    # 유사도 비교 데이터
+
+        # 3개의 similarity 지표의 평균 계산
         similarity=[]
-        for idx in range(len(target)):
-            similarity.append(float(target['tfidf_cos'].iloc[idx])+float(target['ft_sim'].iloc[idx])+float(target['ft-ft_sim'].iloc[idx]))
-        target['similarity'] = similarity
-        sorted_data= target.sort_values(by = ['store_id', 'tfidf_cos'], ascending = True)
-        sorted_data.to_csv(self.file_dir+'sort_result_tfidf.csv', index = False)
-        sorted_data= target.sort_values(by = ['store_id', 'ft_sim'], ascending = True)
-        sorted_data.to_csv(self.file_dir+'sort_result_ft.csv', index = False)
-        sorted_data= target.sort_values(by = ['store_id', 'ft-ft_sim'], ascending = True)
-        sorted_data.to_csv(self.file_dir+'sort_result_ptft.csv', index = False)
+        for idx in range(len(data)):
+            similarity.append(float(data['tfidf_cos'].iloc[idx])+float(data['ft_sim'].iloc[idx])+float(data['ft-ft_sim'].iloc[idx]))
+        data['similarity'] = similarity
+
+        # tfidf로 sorting
+        sorted_data= data.sort_values(by = ['store_id', 'tfidf_cos'], ascending = True)
+        sorted_data.to_csv(self.file_dir+'sorting_tfidf.csv', index = False)
+        # fasttext로 sorting
+        sorted_data= data.sort_values(by = ['store_id', 'ft_sim'], ascending = True)
+        sorted_data.to_csv(self.file_dir+'sorting_ft.csv', index = False)
+        # pre-trained fasttext로 sorting
+        sorted_data= data.sort_values(by = ['store_id', 'ft-ft_sim'], ascending = True)
+        sorted_data.to_csv(self.file_dir+'sorting_ptft.csv', index = False)
 
         
         
